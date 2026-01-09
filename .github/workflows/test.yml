@@ -32,25 +32,23 @@ jobs:
         run: dotnet build source/TSQLLint.sln --configuration Release --no-restore
 
       - name: Run tests with coverage
-        run: dotnet test source/TSQLLint.sln --configuration Release --no-build --verbosity normal --collect:"XPlat Code Coverage" --settings source/coverlet.runsettings
+        run: dotnet test source/TSQLLint.sln --configuration Release --no-build --verbosity normal --collect:"XPlat Code Coverage" --settings source/coverlet.runsettings --results-directory ./coverage
 
       - name: Generate coverage report
         if: always()
         run: |
           dotnet tool install -g dotnet-reportgenerator-globaltool
-          reportgenerator -reports:"**/coverage.cobertura.xml" -targetdir:"coverage" -reporttypes:"Html;HtmlSummary;Cobertura"
+          COVERAGE_FILE=$(find ./coverage -name coverage.opencover.xml | head -1)
+          if [ -n "$COVERAGE_FILE" ]; then
+            reportgenerator -reports:"$COVERAGE_FILE" -targetdir:"./coverage/report" -reporttypes:"Html;HtmlSummary"
+          else
+            echo "Warning: No coverage file found"
+          fi
 
       - name: Upload coverage artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
-          path: coverage/
+          path: coverage/report/
           retention-days: 30
-
-      - name: Comment coverage report on PR
-        if: always() && github.event_name == 'pull_request'
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-html
-          path: coverage/index.html
