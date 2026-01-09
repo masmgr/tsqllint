@@ -32,9 +32,6 @@ dotnet build source/TSQLLint.sln --configuration Release
 # Run all tests
 dotnet test source/TSQLLint.sln
 
-# Run tests for a specific framework (net6.0, net7.0, or net8.0)
-dotnet test source/TSQLLint.sln -property:TargetFramework=net8.0
-
 # Run a single test class
 dotnet test source/TSQLLint.sln --filter "ClassName=TestClassName"
 
@@ -59,7 +56,7 @@ The project includes bash scripts for local development:
 The project uses:
 - **StyleCop.Analyzers** for C# code style (rules in `.stylecop/stylecop.ruleset`)
 - Warnings are treated as errors in Debug configuration (`TreatWarningsAsErrors`)
-- Target frameworks: .NET 6.0, 7.0, and 8.0
+- Target framework: .NET 8.0 (LTS supported until November 2026)
 
 ## Project Structure
 
@@ -148,7 +145,7 @@ Rules are implemented as visitors that extend **BaseRuleVisitor** (extends TSqlF
 Plugins implement **IPlugin** from TSQLLint.Common and can:
 - Implement custom linting rules via `GetRules()` (returns `IDictionary<string, ISqlLintRule>`)
 - Or perform custom actions via `PerformAction(IPluginContext context, IReporter reporter)`
-- Must target net6.0+
+- Must target net8.0 or higher
 - Referenced in .tsqllintrc under "plugins" with DLL path
 
 ## CI/CD Pipeline
