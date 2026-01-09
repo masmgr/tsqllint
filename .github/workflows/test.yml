@@ -1,0 +1,56 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for version detection
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore source/TSQLLint.sln --verbosity m
+
+      - name: Build solution
+        run: dotnet build source/TSQLLint.sln --configuration Release --no-restore
+
+      - name: Run tests with coverage
+        run: dotnet test source/TSQLLint.sln --configuration Release --no-build --verbosity normal --collect:"XPlat Code Coverage" --settings source/coverlet.runsettings
+
+      - name: Generate coverage report
+        if: always()
+        run: |
+          dotnet tool install -g dotnet-reportgenerator-globaltool
+          reportgenerator -reports:"**/coverage.cobertura.xml" -targetdir:"coverage" -reporttypes:"Html;HtmlSummary;Cobertura"
+
+      - name: Upload coverage artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
+          retention-days: 30
+
+      - name: Comment coverage report on PR
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-html
+          path: coverage/index.html
