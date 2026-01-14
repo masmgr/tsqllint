@@ -13,34 +13,34 @@ namespace TSQLLint.Infrastructure.Parser
     {
         private readonly TSqlParser parser;
 
-        public FragmentBuilder() : this(Constants.DefaultCompatabilityLevel)
+        public FragmentBuilder() : this(Constants.DefaultCompatibilityLevel)
         {
         }
 
-        public FragmentBuilder(int compatabilityLevel)
+        public FragmentBuilder(int compatibilityLevel)
         {
-            parser = GetSqlParser(CompatabilityLevel.Validate(compatabilityLevel));
+            parser = GetSqlParser(CompatibilityLevel.Validate(compatibilityLevel));
         }
 
         public TSqlFragment GetFragment(TextReader txtRdr, out IList<ParseError> errors, IEnumerable<IOverride> overrides = null)
         {
             TSqlFragment fragment;
 
-            OverrideCompatabilityLevel compatibilityLevel = null;
+            OverrideCompatibilityLevel compatibilityLevel = null;
             if (overrides != null)
             {
                 foreach (var lintingOverride in overrides)
                 {
-                    if (lintingOverride is OverrideCompatabilityLevel overrideCompatability)
+                    if (lintingOverride is OverrideCompatibilityLevel overrideCompatibility)
                     {
-                        compatibilityLevel = overrideCompatability;
+                        compatibilityLevel = overrideCompatibility;
                     }
                 }
             }
 
             if (compatibilityLevel != null )
             {
-                var tempParser = GetSqlParser(compatibilityLevel.CompatabilityLevel);
+                var tempParser = GetSqlParser(compatibilityLevel.CompatibilityLevel);
                 fragment = tempParser.Parse(txtRdr, out errors);
                 return fragment?.FirstTokenIndex != -1 ? fragment : null;
             }
@@ -49,10 +49,10 @@ namespace TSQLLint.Infrastructure.Parser
             return fragment?.FirstTokenIndex != -1 ? fragment : null;
         }
 
-        private static TSqlParser GetSqlParser(int compatabilityLevel)
+        private static TSqlParser GetSqlParser(int compatibilityLevel)
         {
-            compatabilityLevel = CompatabilityLevel.Validate(compatabilityLevel);
-            var fullyQualifiedName = string.Format("Microsoft.SqlServer.TransactSql.ScriptDom.TSql{0}Parser", compatabilityLevel);
+            compatibilityLevel = CompatibilityLevel.Validate(compatibilityLevel);
+            var fullyQualifiedName = string.Format("Microsoft.SqlServer.TransactSql.ScriptDom.TSql{0}Parser", compatibilityLevel);
 
             TSqlParser parser = null;
 

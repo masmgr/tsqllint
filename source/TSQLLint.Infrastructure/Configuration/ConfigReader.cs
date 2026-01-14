@@ -36,7 +36,7 @@ namespace TSQLLint.Infrastructure.Configuration
 
         public bool IsConfigLoaded { get; private set; }
 
-        public int CompatabilityLevel { get; private set; }
+        public int CompatibilityLevel { get; private set; }
 
         public void ListPlugins()
         {
@@ -169,9 +169,9 @@ namespace TSQLLint.Infrastructure.Configuration
 
         private void SetupParser(JToken jsonObject)
         {
-            var compatabilityLevel = (jsonObject.SelectTokens("..compatibility-level").FirstOrDefault() ?? jsonObject.SelectTokens("..compatability-level").FirstOrDefault())?.ToString();
-            int.TryParse(compatabilityLevel, out var parsedCompatabilityLevel);
-            CompatabilityLevel = Core.CompatabilityLevel.Validate(parsedCompatabilityLevel);
+            var compatibilityLevel = (jsonObject.SelectTokens("..compatibility-level").FirstOrDefault() ?? jsonObject.SelectTokens("..compatability-level").FirstOrDefault())?.ToString();
+            int.TryParse(compatibilityLevel, out var parsedCompatibilityLevel);
+            CompatibilityLevel = Core.CompatibilityLevel.Validate(parsedCompatibilityLevel);
         }
     }
 }

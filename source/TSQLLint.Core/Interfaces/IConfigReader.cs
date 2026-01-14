@@ -7,7 +7,7 @@ namespace TSQLLint.Core.Interfaces
     {
         bool IsConfigLoaded { get; }
 
-        int CompatabilityLevel { get; }
+        int CompatibilityLevel { get; }
 
         string ConfigFileLoadedFrom { get; }
 

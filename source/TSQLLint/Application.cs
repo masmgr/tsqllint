@@ -64,7 +64,7 @@ namespace TSQLLint
 
                 do
                 {
-                    var fragmentBuilder = new FragmentBuilder(configReader.CompatabilityLevel);
+                    var fragmentBuilder = new FragmentBuilder(configReader.CompatibilityLevel);
                     var rules = RuleVisitorFriendlyNameTypeMap.Rules;
                     var ruleVisitorBuilder = new RuleVisitorBuilder(configReader, this.reporter, rules);
                     var ruleVisitor = new SqlRuleVisitor(ruleVisitorBuilder, fragmentBuilder, reporter);

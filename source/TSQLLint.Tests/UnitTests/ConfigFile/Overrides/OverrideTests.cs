@@ -18,19 +18,19 @@ namespace TSQLLint.Tests.UnitTests.ConfigFile.Overrides
             {
                 "valid compatability-level override",
                 @"/* tsqllint-override compatability-level = 130 */",
-                new List<IOverride> { new OverrideCompatabilityLevel("130") }
+                new List<IOverride> { new OverrideCompatibilityLevel("130") }
             },
             new object[]
             {
                 "valid compatibility-level override",
                 @"/* tsqllint-override compatibility-level = 130 */",
-                new List<IOverride> { new OverrideCompatabilityLevel("130") }
+                new List<IOverride> { new OverrideCompatibilityLevel("130") }
             },
             new object[]
             {
                 "valid compatibility-level override and unsupported 'foo' override",
                 @"/* tsqllint-override compatibility-level = 90, foo = bar */",
-                new List<IOverride> { new OverrideCompatabilityLevel("90") }
+                new List<IOverride> { new OverrideCompatibilityLevel("90") }
             },
             new object[]
             {
@@ -39,7 +39,7 @@ namespace TSQLLint.Tests.UnitTests.ConfigFile.Overrides
                    tsqllint-disable select-star
                    tsqllint-override compatibility-level = 80 
                 */",
-                new List<IOverride> { new OverrideCompatabilityLevel("80") }
+                new List<IOverride> { new OverrideCompatibilityLevel("80") }
             },
             new object[]
             {
@@ -48,7 +48,7 @@ namespace TSQLLint.Tests.UnitTests.ConfigFile.Overrides
                    tsqllint-disable select-star
                    tsqllint-override compatibility-level = 80, foo = bar 
                 */",
-                new List<IOverride> { new OverrideCompatabilityLevel("80") }
+                new List<IOverride> { new OverrideCompatibilityLevel("80") }
             }
         };
 
@@ -64,10 +64,10 @@ namespace TSQLLint.Tests.UnitTests.ConfigFile.Overrides
         }
 
         [Test]
-        public void TestInvalidCompatabilityLevels()
+        public void TestInvalidCompatibilityLevels()
         {
-            var testOverrideCompatabilityLevel = new OverrideCompatabilityLevel("foo");
-            Assert.AreEqual(Constants.DefaultCompatabilityLevel, testOverrideCompatabilityLevel.CompatabilityLevel);
+            var testOverrideCompatibilityLevel = new OverrideCompatibilityLevel("foo");
+            Assert.AreEqual(Constants.DefaultCompatibilityLevel, testOverrideCompatibilityLevel.CompatibilityLevel);
         }
     }
 }

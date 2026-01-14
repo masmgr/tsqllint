@@ -22,9 +22,9 @@ namespace TSQLLint.Tests.Helpers.ObjectComparers
 
         public int Compare(IOverride x, IOverride y)
         {
-            if (x.GetType() == typeof(OverrideCompatabilityLevel) && y.GetType() == typeof(OverrideCompatabilityLevel))
+            if (x.GetType() == typeof(OverrideCompatibilityLevel) && y.GetType() == typeof(OverrideCompatibilityLevel))
             {
-                if (x is OverrideCompatabilityLevel lhs && y is OverrideCompatabilityLevel rhs && lhs.CompatabilityLevel != rhs.CompatabilityLevel)
+                if (x is OverrideCompatibilityLevel lhs && y is OverrideCompatibilityLevel rhs && lhs.CompatibilityLevel != rhs.CompatibilityLevel)
                 {
                     return -1;
                 }
