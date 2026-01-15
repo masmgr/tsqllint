@@ -1,0 +1,70 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        dotnet-version: ['8.0.x']
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for version detection
+
+      - name: Setup .NET ${{ matrix.dotnet-version }}
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Restore dependencies
+        run: dotnet restore source/TSQLLint.sln --verbosity minimal
+
+      - name: Build solution
+        run: dotnet build source/TSQLLint.sln --configuration Release --no-restore
+
+      - name: Run tests with coverage
+        run: dotnet test source/TSQLLint.sln --configuration Release --no-build --verbosity normal --framework net8.0 --collect:"XPlat Code Coverage" --settings source/coverlet.runsettings --results-directory ./coverage
+
+      - name: Generate coverage report
+        if: matrix.os == 'ubuntu-latest'
+        shell: bash
+        run: |
+          dotnet tool install -g dotnet-reportgenerator-globaltool
+          COVERAGE_FILE=$(find ./coverage -name coverage.opencover.xml | head -1)
+          if [ -n "$COVERAGE_FILE" ]; then
+            reportgenerator -reports:"$COVERAGE_FILE" -targetdir:"./coverage/report" -reporttypes:"Html;HtmlSummary"
+          else
+            echo "::error::No coverage file found"
+            exit 1
+          fi
+
+      - name: Upload coverage artifact
+        if: matrix.os == 'ubuntu-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/report/
+          retention-days: 30
+          if-no-files-found: error
