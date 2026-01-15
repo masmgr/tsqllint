@@ -58,7 +58,7 @@ namespace TSQLLint.Infrastructure.Rules
             {
                 var errorWord = new Regex(@"\w+").Matches(line[startCharIndex..]).First().Value;
 
-                actions.RepaceInlineAt(lineIndex, startCharIndex, errorWord.ToUpper());
+                actions.ReplaceInlineAt(lineIndex, startCharIndex, errorWord.ToUpper());
             }
         }
 
