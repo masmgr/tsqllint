@@ -43,6 +43,7 @@ namespace TSQLLint.Infrastructure.Parser
             { "set-transaction-isolation-level", typeof(SetTransactionIsolationLevelRule) },
             { "set-variable", typeof(SetVariableRule) },
             { "unicode-string", typeof(UnicodeStringRule) },
+            { "utc-datetime", typeof(UtcDateTimeRule) },
             { "update-where", typeof(UpdateWhereRule) },
             { "upper-lower", typeof(UpperLowerRule) }
         };

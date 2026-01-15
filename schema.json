@@ -107,6 +107,10 @@
         "unicode-string": {
           "$ref": "#/definitions/rule"
         },
+        "utc-datetime": {
+          "$ref": "#/definitions/rule",
+          "description": "Disallow host-local date/time functions; use UTC equivalents"
+        },
         "update-where": {
           "$ref": "#/definitions/rule",
           "description": "Enforce use of WHERE condition when using UPDATE"
