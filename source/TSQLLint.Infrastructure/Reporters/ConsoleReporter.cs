@@ -12,6 +12,7 @@ namespace TSQLLint.Infrastructure.Reporters
         public bool ReporterMuted { get; set; }
         public int? FixedCount { get; set; }
         private readonly ConcurrentBag<IRuleViolation> ruleViolations = new();
+        private readonly ConcurrentDictionary<string, byte> reportedViolations = new();
         private int errorCount;
         private int warningCount;
 
@@ -22,6 +23,7 @@ namespace TSQLLint.Infrastructure.Reporters
         public void ClearViolations()
         {
             ruleViolations.Clear();
+            reportedViolations.Clear();
         }
 
         [ExcludeFromCodeCoverage]
@@ -47,6 +49,11 @@ namespace TSQLLint.Infrastructure.Reporters
 
         public void ReportViolation(IRuleViolation violation)
         {
+            if (!reportedViolations.TryAdd(GetViolationKey(violation), 0))
+            {
+                return;
+            }
+
             if (ShouldCollectViolations)
             {
                 ruleViolations.Add(violation);
@@ -83,6 +90,11 @@ namespace TSQLLint.Infrastructure.Reporters
         public void ReportViolation(string fileName, string line, string column, string severity, string ruleName, string violationText)
         {
             Report($"{fileName}({line},{column}): {severity} {ruleName} : {violationText}.");
+        }
+
+        private static string GetViolationKey(IRuleViolation violation)
+        {
+            return $"{violation.FileName}|{violation.RuleName}|{violation.Text}|{violation.Line}|{violation.Column}|{violation.Severity}";
         }
     }
 }
