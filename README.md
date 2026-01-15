@@ -126,6 +126,7 @@ TSQLLint rules may be set to "off", "warning", or "error". Rules that are violat
     "linked-server": "error",
     "multi-table-alias": "error",
     "named-constraint": "error",
+    "nested-block-comments": "warning",
     "non-sargable": "error",
     "object-property": "error",
     "print-statement": "error",

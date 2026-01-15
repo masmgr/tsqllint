@@ -31,6 +31,7 @@ namespace TSQLLint.Infrastructure.Parser
             { "linked-server", typeof(LinkedServerRule) },
             { "multi-table-alias", typeof(MultiTableAliasRule) },
             { "named-constraint", typeof(NamedConstraintRule) },
+            { "nested-block-comments", typeof(NestedBlockCommentsRule) },
             { "non-sargable", typeof(NonSargableRule) },
             { "object-property", typeof(ObjectPropertyRule) },
             { "print-statement", typeof(PrintStatementRule) },
