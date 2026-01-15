@@ -63,7 +63,14 @@ namespace TSQLLint.Infrastructure.Parser
                         }
 
                         var lines = new List<string>(fileLines);
-                        Rules[violation.RuleName].FixViolation(lines, violation, fileLineActions);
+                        try
+                        {
+                            Rules[violation.RuleName].FixViolation(lines, violation, fileLineActions);
+                        }
+                        catch
+                        {
+                            // Skip fixes that cannot be applied due to parse errors.
+                        }
                     }
                 }
 
