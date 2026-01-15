@@ -21,25 +21,27 @@ namespace TSQLLint.Infrastructure.Rules.RuleExceptions
         public IEnumerable<IExtendedRuleException> GetIgnoredRuleList(Stream fileStream)
         {
             var ruleExceptionList = new List<IExtendedRuleException>();
-            TextReader reader = new StreamReader(fileStream);
-
             var lineNumber = 0;
-            string line;
-            while ((line = reader.ReadLine()) != null)
+
+            using (TextReader reader = new StreamReader(fileStream, leaveOpen: true))
             {
-                lineNumber++;
-                if (line.Length > Constants.MaxLineWidthForRegexEval || !line.Contains("tsqllint-"))
+                string line;
+                while ((line = reader.ReadLine()) != null)
                 {
-                    continue;
-                }
+                    lineNumber++;
+                    if (line.Length > Constants.MaxLineWidthForRegexEval || !line.Contains("tsqllint-"))
+                    {
+                        continue;
+                    }
 
-                var match = RuleExceptionRegex.Match(line);
-                if (!match.Success)
-                {
-                    continue;
-                }
+                    var match = RuleExceptionRegex.Match(line);
+                    if (!match.Success)
+                    {
+                        continue;
+                    }
 
-                FindIgnoredRules(ruleExceptionList, lineNumber, match);
+                    FindIgnoredRules(ruleExceptionList, lineNumber, match);
+                }
             }
 
             fileStream.Seek(0, SeekOrigin.Begin);

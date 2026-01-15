@@ -15,30 +15,32 @@ namespace TSQLLint.Infrastructure.Configuration.Overrides
         public IEnumerable<IOverride> GetOverrideList(Stream fileStream)
         {
             var overrideList = new List<IOverride>();
-            TextReader reader = new StreamReader(fileStream);
 
-            string line;
-            while ((line = reader.ReadLine()) != null)
+            using (TextReader reader = new StreamReader(fileStream, leaveOpen: true))
             {
-                if (line.Length > Constants.MaxLineWidthForRegexEval || ! line.Contains("tsqllint-override"))
+                string line;
+                while ((line = reader.ReadLine()) != null)
                 {
-                    continue;
-                }
-                
-                var match = OverrideRegex.Match(line);
-                if (!match.Success)
-                {
-                    continue;
-                }
-
-                var overrideDetails = match.Groups[1].Value.Split(',').Select(p => p.Trim()).ToList();
-                foreach (var overrideDetail in overrideDetails)
-                {
-                    var details = overrideDetail.Split(' ').Select(p => p.Trim()).ToList();
-                    if (OverrideTypeMap.List.ContainsKey(details[0]))
+                    if (line.Length > Constants.MaxLineWidthForRegexEval || ! line.Contains("tsqllint-override"))
                     {
-                        var overrideType = OverrideTypeMap.List.GetValueOrDefault(details[0]);
-                        overrideList.Add((IOverride)Activator.CreateInstance(overrideType, details[2]));
+                        continue;
+                    }
+
+                    var match = OverrideRegex.Match(line);
+                    if (!match.Success)
+                    {
+                        continue;
+                    }
+
+                    var overrideDetails = match.Groups[1].Value.Split(',').Select(p => p.Trim()).ToList();
+                    foreach (var overrideDetail in overrideDetails)
+                    {
+                        var details = overrideDetail.Split(' ').Select(p => p.Trim()).ToList();
+                        if (OverrideTypeMap.List.ContainsKey(details[0]))
+                        {
+                            var overrideType = OverrideTypeMap.List.GetValueOrDefault(details[0]);
+                            overrideList.Add((IOverride)Activator.CreateInstance(overrideType, details[2]));
+                        }
                     }
                 }
             }
