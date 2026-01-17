@@ -32,5 +32,23 @@ namespace TSQLLint.Tests.UnitTests.Reporter
             reporter.DidNotReceive().Report("foo.sql(1,3): off rule name : rule text.");
             reporter.Received().Report("\nLinted 1 files in 3661 seconds\n\n2 Errors.\n1 Warnings.");
         }
+
+        [Test]
+        public void ConsoleReporter_DedupesDuplicateViolations()
+        {
+            // arrange
+            var reporter = Substitute.ForPartsOf<ConsoleReporter>();
+            reporter.When(x => x.Report(Arg.Any<string>())).DoNotCallBase(); // suppress console output
+            var violation = new RuleViolation("foo.sql", "rule name", "rule text", 1, 1, RuleViolationSeverity.Error);
+
+            // act
+            reporter.ReportViolation(violation);
+            reporter.ReportViolation(violation);
+            reporter.ReportResults(new TimeSpan(1, 1, 1), 1);
+
+            // assert
+            reporter.Received(1).Report("foo.sql(1,1): error rule name : rule text.");
+            reporter.Received().Report("\nLinted 1 files in 3661 seconds\n\n1 Errors.\n0 Warnings.");
+        }
     }
 }
