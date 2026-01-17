@@ -8,6 +8,17 @@ namespace TSQLLint.Infrastructure.Rules
 {
     public class NonSargableRule : BaseRuleVisitor, ISqlRule
     {
+        private static readonly HashSet<string> DateFunctions = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "DATEADD",
+            "DATEDIFF",
+            "DATEDIFF_BIG",
+            "DATENAME",
+            "DATEPART",
+            "DATETRUNC",
+            "DATE_BUCKET"
+        };
+
         private readonly List<TSqlFragment> errorsReported = new();
 
         public NonSargableRule(Action<string, string, int, int> errorCallback)
@@ -84,7 +95,6 @@ namespace TSQLLint.Infrastructure.Rules
         {
             private readonly bool isMultiClause;
             private readonly Action<TSqlFragment> childCallback;
-            private bool hasColumnReferenceParameter;
 
             public FunctionVisitor(Action<TSqlFragment> errorCallback, bool isMultiClause)
             {
@@ -94,51 +104,58 @@ namespace TSQLLint.Infrastructure.Rules
 
             public override void Visit(FunctionCall node)
             {
-                switch (node.FunctionName.Value.ToUpper())
+                var functionName = node.FunctionName?.Value;
+                if (string.IsNullOrWhiteSpace(functionName))
                 {
-                    // allow isnull predicates provided other filters exist
-                    case "ISNULL" when isMultiClause:
-                        return;
-                    case "DATEADD":
-                    case "DATEDIFF":
-                    case "DATEDIFF_BIG":
-                    case "DATENAME":
-                    case "DATEPART":
-                    case "DATETRUNC":
-                    case "DATE_BUCKET":
-                        hasColumnReferenceParameter = true;
-                        break;
+                    return;
                 }
 
-                FindColumnReferences(node);
+                if (functionName.Equals("ISNULL", StringComparison.OrdinalIgnoreCase) && isMultiClause)
+                {
+                    return;
+                }
+
+                var skipDatePartParameter = DateFunctions.Contains(functionName);
+                FindColumnReferences(node, skipDatePartParameter);
             }
 
             public override void Visit(LeftFunctionCall node)
             {
-                FindColumnReferences(node);
+                FindColumnReferences(node, false);
             }
 
             public override void Visit(RightFunctionCall node)
             {
-                FindColumnReferences(node);
+                FindColumnReferences(node, false);
             }
 
             public override void Visit(ConvertCall node)
             {
-                FindColumnReferences(node);
+                FindColumnReferences(node, false);
             }
 
             public override void Visit(CastCall node)
             {
-                FindColumnReferences(node);
+                FindColumnReferences(node, false);
             }
 
-            private void FindColumnReferences(TSqlFragment node)
+            private void FindColumnReferences(TSqlFragment node, bool skipDatePartParameter)
             {
                 var columnReferenceVisitor = new ColumnReferenceVisitor();
-                node.AcceptChildren(columnReferenceVisitor);
 
-                if (columnReferenceVisitor.ColumnReferenceFound && (!hasColumnReferenceParameter || columnReferenceVisitor.ColumnReferenceCount > 1))
+                if (skipDatePartParameter && node is FunctionCall functionCall)
+                {
+                    for (var i = 1; i < functionCall.Parameters.Count; i++)
+                    {
+                        functionCall.Parameters[i].Accept(columnReferenceVisitor);
+                    }
+                }
+                else
+                {
+                    node.AcceptChildren(columnReferenceVisitor);
+                }
+
+                if (columnReferenceVisitor.ColumnReferenceFound)
                 {
                     childCallback(node);
                 }
@@ -149,12 +166,34 @@ namespace TSQLLint.Infrastructure.Rules
         {
             public bool ColumnReferenceFound { get; private set; }
 
-            public int ColumnReferenceCount { get; private set; }
-
             public override void Visit(ColumnReferenceExpression node)
             {
-                ColumnReferenceCount++;
                 ColumnReferenceFound = true;
+            }
+
+            public override void ExplicitVisit(FunctionCall node)
+            {
+                if (ColumnReferenceFound)
+                {
+                    return;
+                }
+
+                var functionName = node.FunctionName?.Value;
+                if (!string.IsNullOrWhiteSpace(functionName) && DateFunctions.Contains(functionName))
+                {
+                    for (var i = 1; i < node.Parameters.Count; i++)
+                    {
+                        node.Parameters[i].Accept(this);
+                        if (ColumnReferenceFound)
+                        {
+                            return;
+                        }
+                    }
+
+                    return;
+                }
+
+                node.AcceptChildren(this);
             }
         }
     }
