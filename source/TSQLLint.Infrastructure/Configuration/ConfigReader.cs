@@ -34,6 +34,11 @@ namespace TSQLLint.Infrastructure.Configuration
 
         public string ConfigFileLoadedFrom { get; private set; }
 
+        /// <summary>
+        /// Gets a value indicating whether config loading was attempted and completed.
+        /// True when a valid config file is parsed or default in-memory config is loaded.
+        /// False when LoadConfig is not called, config file doesn't exist, or contains invalid JSON.
+        /// </summary>
         public bool IsConfigLoaded { get; private set; }
 
         public int CompatabilityLevel { get; private set; }
@@ -115,6 +120,7 @@ namespace TSQLLint.Infrastructure.Configuration
             else
             {
                 reporter.Report($@"Config file not found: {configFilePath}");
+                IsConfigLoaded = false;
             }
         }
 
@@ -130,6 +136,7 @@ namespace TSQLLint.Infrastructure.Configuration
             else
             {
                 reporter.Report("Config file is not valid Json.");
+                IsConfigLoaded = false;
             }
         }
 
