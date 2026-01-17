@@ -26,22 +26,35 @@ namespace TSQLLint.Infrastructure.Rules
 
         public override void FixViolation(List<string> fileLines, IRuleViolation ruleViolation, FileLineActions actions)
         {
-            var node = FixHelpers.FindNodes<TSqlScript>(fileLines).First();
-
-            int index;
-            for (index = node.FirstTokenIndex; index <= node.LastTokenIndex; index++)
+            try
             {
-                var token = node.ScriptTokenStream[index];
-                var tokenType = token.TokenType;
+                var node = FixHelpers.FindNodes<TSqlScript>(fileLines).First();
 
-                if (!BeforeSet.Contains(tokenType))
+                int index;
+                for (index = node.FirstTokenIndex; index <= node.LastTokenIndex; index++)
                 {
-                    break;
-                }
-            }
+                    var token = node.ScriptTokenStream[index];
+                    var tokenType = token.TokenType;
 
-            actions.RemoveAll(Remove);
-            actions.Insert(node.ScriptTokenStream[index].Line - 1, Insert);
+                    if (!BeforeSet.Contains(tokenType))
+                    {
+                        break;
+                    }
+                }
+
+                actions.RemoveAll(Remove);
+                actions.Insert(node.ScriptTokenStream[index].Line - 1, Insert);
+            }
+            catch (Exception ex) when (ex.Message.Contains("Parsing failed") || ex.Message.Contains("Incorrect syntax"))
+            {
+                // FixHelpers.FindNodes failed due to parsing errors
+                // This can happen with newer T-SQL syntax (e.g., CREATE OR ALTER) that may not be fully supported
+                // Skip the fix and continue - the violation will remain but won't crash the application
+                System.Diagnostics.Debug.WriteLine(
+                    $"Warning: Cannot fix '{ruleViolation.RuleName}' violation at line {ruleViolation.Line}. " +
+                    $"This may be due to newer T-SQL syntax (e.g., CREATE OR ALTER) that is not fully supported by the fix feature. " +
+                    $"Error: {ex.Message}");
+            }
         }
     }
 }
