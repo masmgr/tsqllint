@@ -22,6 +22,10 @@ namespace TSQLLint.Tests.UnitTests.LintingRules
             },
             new object[]
             {
+                "non-sargable-no-error-nested-date-functions", new List<RuleViolation>()
+            },
+            new object[]
+            {
                 "non-sargable-one-error-where-clause", new List<RuleViolation>
                 {
                     new RuleViolation(RuleName, 1, 25)
