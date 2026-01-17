@@ -110,7 +110,7 @@ namespace TSQLLint.Infrastructure.Rules
             var firstWhereLine = whereClause.ScriptTokenStream[whereClause.FirstTokenIndex].Line;
             var lastWhereLine = whereClause.ScriptTokenStream[whereClause.LastTokenIndex].Line;
 
-            // Delete mutliline where
+            // Delete multiline where
             var anyDeleted = false;
             for (int line = lastWhereLine; line > firstWhereLine; line--)
             {

@@ -27,9 +27,9 @@ namespace TSQLLint.Infrastructure.Rules
 
         public override void Visit(DeclareVariableStatement node)
         {
-            foreach (var decalaration in node.Declarations)
+            foreach (var declaration in node.Declarations)
             {
-                variableNames.Add(decalaration.VariableName.Value);
+                variableNames.Add(declaration.VariableName.Value);
             }
         }
 
