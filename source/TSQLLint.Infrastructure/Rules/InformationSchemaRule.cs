@@ -86,7 +86,7 @@ namespace TSQLLint.Infrastructure.Rules
 
                 if (newFrom != null)
                 {
-                    actions.RepaceInlineAt(fromClause.StartLine - 1, fromClause.StartColumn - 1,
+                    actions.ReplaceInlineAt(fromClause.StartLine - 1, fromClause.StartColumn - 1,
                     newFrom, oldFrom.Length);
                 }
             }
@@ -110,7 +110,7 @@ namespace TSQLLint.Infrastructure.Rules
             var firstWhereLine = whereClause.ScriptTokenStream[whereClause.FirstTokenIndex].Line;
             var lastWhereLine = whereClause.ScriptTokenStream[whereClause.LastTokenIndex].Line;
 
-            // Delete mutliline where
+            // Delete multiline where
             var anyDeleted = false;
             for (int line = lastWhereLine; line > firstWhereLine; line--)
             {
@@ -129,7 +129,7 @@ namespace TSQLLint.Infrastructure.Rules
                     && x.Text != "\n")
                 .Select(x => x.Text));
 
-            actions.RepaceInlineAt(whereClause.StartLine - 1, whereClause.StartColumn - 1,
+            actions.ReplaceInlineAt(whereClause.StartLine - 1, whereClause.StartColumn - 1,
                 newWhere, oldWhere.Length);
         }
 
