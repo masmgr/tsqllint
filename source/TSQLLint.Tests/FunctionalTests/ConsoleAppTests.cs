@@ -226,5 +226,62 @@ namespace TSQLLint.Tests.FunctionalTests
 
             Assert.IsTrue(passed);
         }
+
+        [TestCase(@"TestFiles/create-or-alter-procedure.sql")]
+        public void CreateOrAlterWithFixShouldNotCrashTest(string testFile)
+        {
+            var errorDetected = false;
+            var exceptionDetected = false;
+
+            void OutputHandler(object sender, DataReceivedEventArgs args)
+            {
+                TestContext.Out.WriteLine(args.Data);
+                if (args.Data != null && args.Data.Contains("TSQLLint encountered a problem"))
+                {
+                    errorDetected = true;
+                }
+            }
+
+            void ErrorHandler(object sender, DataReceivedEventArgs args)
+            {
+                TestContext.Out.WriteLine($"Error: {args.Data}");
+                if (args.Data != null && (args.Data.Contains("Exception") || args.Data.Contains("Parsing failed")))
+                {
+                    exceptionDetected = true;
+                }
+            }
+
+            void ExitHandler(object sender, EventArgs args)
+            {
+                var processExitCode = ((Process)sender).ExitCode;
+
+                // The process should not crash (exit code should not indicate an unhandled exception)
+                // Exit code 0 (no errors) or 1 (linting errors) are acceptable
+                Assert.That(processExitCode, Is.LessThanOrEqualTo(1), "Process should not crash with unhandled exception");
+            }
+
+            var testPath = Path.GetFullPath(Path.Combine(testDirectoryPath, $@"FunctionalTests/{testFile}"));
+            var testOutputPath = testPath.Replace(".sql", ".fixed.sql");
+
+            var testFileContent = File.ReadAllText(testPath);
+            File.WriteAllText(testOutputPath, testFileContent);
+
+            var configFilePath = Path.GetFullPath(Path.Combine(testDirectoryPath, @"FunctionalTests/.tsqllintrc"));
+
+            // Run with --fix option
+            var fixProcess = ConsoleAppTestHelper.GetProcess($"-x -c {configFilePath} {testOutputPath}", OutputHandler, ErrorHandler, ExitHandler);
+
+            ConsoleAppTestHelper.RunApplication(fixProcess);
+
+            // The application should not crash with "TSQLLint encountered a problem"
+            Assert.IsFalse(errorDetected, "Application should not crash with 'TSQLLint encountered a problem' message");
+            Assert.IsFalse(exceptionDetected, "Application should not throw parsing exceptions");
+
+            // Clean up
+            if (File.Exists(testOutputPath))
+            {
+                File.Delete(testOutputPath);
+            }
+        }
     }
 }
