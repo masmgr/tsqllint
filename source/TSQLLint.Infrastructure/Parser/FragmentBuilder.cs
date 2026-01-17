@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Reflection;
 using Microsoft.SqlServer.TransactSql.ScriptDom;
 using TSQLLint.Core;
 using TSQLLint.Core.Interfaces;
@@ -40,7 +38,7 @@ namespace TSQLLint.Infrastructure.Parser
                 }
             }
 
-            if (compatibilityLevel != null )
+            if (compatibilityLevel != null)
             {
                 var tempParser = GetSqlParser(compatibilityLevel.CompatabilityLevel);
                 fragment = tempParser.Parse(txtRdr, out errors);
@@ -54,64 +52,21 @@ namespace TSQLLint.Infrastructure.Parser
         private static TSqlParser GetSqlParser(int compatabilityLevel)
         {
             compatabilityLevel = CompatabilityLevel.Validate(compatabilityLevel);
+            var fullyQualifiedName = string.Format("Microsoft.SqlServer.TransactSql.ScriptDom.TSql{0}Parser", compatabilityLevel);
 
-            var availableVersions = GetAvailableParserVersions();
-            if (availableVersions.Count == 0)
-            {
-                return new TSql120Parser(true);
-            }
+            TSqlParser parser = null;
 
-            var bestVersion = GetBestParserVersion(availableVersions, compatabilityLevel);
-            var parserType = typeof(TSqlParser).Assembly.GetType(GetParserTypeName(bestVersion));
-            if (parserType == null)
+            foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
             {
-                return new TSql120Parser(true);
-            }
-
-            return (TSqlParser)Activator.CreateInstance(parserType, new object[] { true });
-        }
-
-        private static IReadOnlyList<int> GetAvailableParserVersions()
-        {
-            var versions = new List<int>();
-            var assembly = typeof(TSqlParser).Assembly;
-            Type[] types;
-            try
-            {
-                types = assembly.GetTypes();
-            }
-            catch (ReflectionTypeLoadException exception)
-            {
-                types = exception.Types.Where(type => type != null).ToArray();
-            }
-
-            foreach (var type in types)
-            {
-                var name = type.Name;
-                if (!name.StartsWith("TSql", StringComparison.Ordinal) || !name.EndsWith("Parser", StringComparison.Ordinal))
+                var parserType = asm.GetType(fullyQualifiedName);
+                if (parserType != null)
                 {
-                    continue;
-                }
-
-                var versionText = name.Substring(4, name.Length - 4 - "Parser".Length);
-                if (int.TryParse(versionText, out var version))
-                {
-                    versions.Add(version);
+                    parser = (TSqlParser)Activator.CreateInstance(parserType, new object[] { true });
+                    break;
                 }
             }
 
-            return versions.Distinct().OrderBy(x => x).ToList();
-        }
-
-        private static int GetBestParserVersion(IReadOnlyList<int> availableVersions, int compatabilityLevel)
-        {
-            var bestMatch = availableVersions.LastOrDefault(x => x <= compatabilityLevel);
-            return bestMatch != 0 ? bestMatch : availableVersions.Last();
-        }
-
-        private static string GetParserTypeName(int compatabilityLevel)
-        {
-            return string.Format("Microsoft.SqlServer.TransactSql.ScriptDom.TSql{0}Parser", compatabilityLevel);
+            return parser ?? new TSql120Parser(true);
         }
     }
 }
