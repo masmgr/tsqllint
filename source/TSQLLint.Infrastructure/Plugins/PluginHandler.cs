@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
+using System.Reflection;
+using System.Text;
 using TSQLLint.Common;
 using TSQLLint.Core.Interfaces;
 
@@ -76,6 +78,25 @@ namespace TSQLLint.Infrastructure.Plugins
             }
         }
 
+        private static void LogExceptionDetails(Exception ex, string context)
+        {
+            var message = new StringBuilder();
+            message.AppendLine($"Exception during: {context}");
+            message.AppendLine($"Exception Type: {ex.GetType().FullName}");
+            message.AppendLine($"Message: {ex.Message}");
+            message.AppendLine($"Stack Trace: {ex.StackTrace}");
+
+            var innerEx = ex.InnerException;
+            while (innerEx != null)
+            {
+                message.AppendLine($"Inner Exception: {innerEx.GetType().FullName}");
+                message.AppendLine($"Inner Message: {innerEx.Message}");
+                innerEx = innerEx.InnerException;
+            }
+
+            Trace.WriteLine(message.ToString());
+        }
+
         public void LoadPluginDirectory(string path)
         {
             var subdirectoryEntries = fileSystem.Directory.GetDirectories(path);
@@ -93,42 +114,78 @@ namespace TSQLLint.Infrastructure.Plugins
 
         public void LoadPlugin(string assemblyPath)
         {
-            var path = fileSystem.Path.GetFullPath(assemblyPath);
-            var dll = assemblyWrapper.LoadFrom(path);
-
-            foreach (var type in assemblyWrapper.GetExportedTypes(dll))
+            try
             {
-                var inerfaces = type.GetInterfaces();
+                var path = fileSystem.Path.GetFullPath(assemblyPath);
+                Assembly dll;
 
-                if (!inerfaces.Contains(typeof(IPlugin)))
+                try
                 {
-                    continue;
+                    dll = assemblyWrapper.LoadFrom(path);
+                }
+                catch (FileNotFoundException ex)
+                {
+                    reporter.Report($"Plugin assembly not found: {assemblyPath}");
+                    LogExceptionDetails(ex, $"Loading assembly from {assemblyPath}");
+                    return;
+                }
+                catch (BadImageFormatException ex)
+                {
+                    reporter.Report($"Plugin assembly has invalid format (wrong architecture or corrupted): {assemblyPath}");
+                    LogExceptionDetails(ex, $"Loading assembly from {assemblyPath}");
+                    return;
+                }
+                catch (FileLoadException ex)
+                {
+                    reporter.Report($"Plugin assembly could not be loaded: {assemblyPath} - {ex.Message}");
+                    LogExceptionDetails(ex, $"Loading assembly from {assemblyPath}");
+                    return;
                 }
 
-                if (!List.ContainsKey(type))
+                foreach (var type in assemblyWrapper.GetExportedTypes(dll))
                 {
-                    var plugin = (IPlugin)Activator.CreateInstance(type);
-                    List.Add(type, plugin);
-                    var version = versionWrapper.GetVersion(dll);
-                    reporter.Report($"Loaded plugin: '{type.FullName}', Version: '{version}'");
+                    var inerfaces = type.GetInterfaces();
 
-                    foreach (var rule in plugin.GetRules())
+                    if (!inerfaces.Contains(typeof(IPlugin)))
                     {
-                        try
+                        continue;
+                    }
+
+                    if (!List.ContainsKey(type))
+                    {
+                        var plugin = (IPlugin)Activator.CreateInstance(type);
+                        List.Add(type, plugin);
+                        var version = versionWrapper.GetVersion(dll);
+                        reporter.Report($"Loaded plugin: '{type.FullName}', Version: '{version}'");
+
+                        foreach (var rule in plugin.GetRules())
                         {
-                            rules.Add(rule.Key, rule.Value);
-                        }
-                        catch (Exception exception)
-                        {
-                            reporter.Report($"There was a problem with plugin: {type.FullName} - {exception.Message}");
-                            Trace.WriteLine(exception);
+                            try
+                            {
+                                rules.Add(rule.Key, rule.Value);
+                            }
+                            catch (ArgumentException ex) when (ex.ParamName == "key")
+                            {
+                                reporter.Report($"Plugin '{type.FullName}' attempted to register duplicate rule: {rule.Key}");
+                                LogExceptionDetails(ex, $"Loading rule {rule.Key} from plugin {type.FullName}");
+                            }
+                            catch (Exception ex)
+                            {
+                                reporter.Report($"Failed to load rule '{rule.Key}' from plugin '{type.FullName}': {ex.Message}");
+                                LogExceptionDetails(ex, $"Loading rule {rule.Key} from plugin {type.FullName}");
+                            }
                         }
                     }
+                    else
+                    {
+                        reporter.Report($"Already loaded plugin with type '{type.FullName}'");
+                    }
                 }
-                else
-                {
-                    reporter.Report($"Already loaded plugin with type '{type.FullName}'");
-                }
+            }
+            catch (Exception ex)
+            {
+                reporter.Report($"Unexpected error loading plugin from {assemblyPath}: {ex.Message}");
+                LogExceptionDetails(ex, $"Loading plugin from {assemblyPath}");
             }
         }
 
@@ -140,10 +197,16 @@ namespace TSQLLint.Infrastructure.Plugins
                 {
                     plugin.Value.PerformAction(pluginContext, reporter);
                 }
-                catch (Exception exception)
+                catch (NotImplementedException)
                 {
-                    reporter.Report($"There was a problem with plugin: {plugin.Key} - {exception.Message}");
-                    Trace.WriteLine(exception);
+                    // Plugin doesn't implement PerformAction (uses GetRules instead)
+                    // This is normal, don't report as error
+                    Trace.WriteLine($"Plugin {plugin.Key} does not implement PerformAction");
+                }
+                catch (Exception ex)
+                {
+                    reporter.Report($"Plugin '{plugin.Key}' threw exception during activation: {ex.GetType().Name} - {ex.Message}");
+                    LogExceptionDetails(ex, $"Activating plugin {plugin.Key} for file {pluginContext.FilePath}");
                 }
             }
         }

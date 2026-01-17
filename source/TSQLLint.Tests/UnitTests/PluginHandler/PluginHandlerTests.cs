@@ -289,7 +289,7 @@ namespace TSQLLint.Tests.UnitTests.PluginHandler
 
             // assert
             Assert.AreEqual(1, pluginHandler.Plugins.Count);
-            reporter.Received().Report(@"There was a problem with plugin: tsqllint_plugin_throws_exception.PluginThatThrows - something bad happened");
+            reporter.Received().Report(@"Plugin 'tsqllint_plugin_throws_exception.PluginThatThrows' threw exception during activation: Exception - something bad happened");
         }
 
         public class TestPlugin2 : TestPlugin
