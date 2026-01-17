@@ -41,7 +41,7 @@ namespace TSQLLint.Tests.UnitTests.LintingRuleExceptions
                         SELECT * FROM FOO:
                   */ tsqllint-enable select-star */",
                 new List<IExtendedRuleException> { new RuleException(typeof(SelectStarRule), "select-star", 3, 6) },
-                new List<IOverride> { new OverrideCompatabilityLevel("100") }
+                new List<IOverride> { new OverrideCompatibilityLevel("100") }
             },
             new object[]
             {
@@ -53,7 +53,7 @@ namespace TSQLLint.Tests.UnitTests.LintingRuleExceptions
                         SELECT * FROM FOO:
                   */ tsqllint-enable select-star */",
                 new List<IExtendedRuleException> { new RuleException(typeof(SelectStarRule), "select-star", 3, 6) },
-                new List<IOverride> { new OverrideCompatabilityLevel("100") }
+                new List<IOverride> { new OverrideCompatibilityLevel("100") }
             },
             new object[]
             {
@@ -65,7 +65,7 @@ namespace TSQLLint.Tests.UnitTests.LintingRuleExceptions
                         SELECT * FROM FOO:
                   */ tsqllint-enable: select-star */",
                 new List<IExtendedRuleException> { new RuleException(typeof(SelectStarRule), "select-star", 2, 6), new RuleException(typeof(SetAnsiNullsRule), "set-ansi", 2, 6) },
-                new List<IOverride> { new OverrideCompatabilityLevel("110") }
+                new List<IOverride> { new OverrideCompatibilityLevel("110") }
             }
         };
 

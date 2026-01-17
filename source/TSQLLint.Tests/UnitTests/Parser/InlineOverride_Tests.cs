@@ -49,7 +49,7 @@ namespace TSQLLint.Tests.UnitTests.Parser
         [TestCaseSource(nameof(TestCases))]
         public void Test(string description, string sql, int expectedOverrideCount)
         {
-            var fragmentBuilder = new FragmentBuilder(Constants.DefaultCompatabilityLevel);
+            var fragmentBuilder = new FragmentBuilder(Constants.DefaultCompatibilityLevel);
             var overrideFider = new OverrideFinder();
 
             var sqlStream = ParsingUtility.GenerateStreamFromString(sql);

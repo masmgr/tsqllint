@@ -246,7 +246,7 @@ namespace TSQLLint.Tests.UnitTests.ConfigFile
 
             // assert
             Assert.IsTrue(configReader.IsConfigLoaded);
-            Assert.AreEqual(120, configReader.CompatabilityLevel);
+            Assert.AreEqual(120, configReader.CompatibilityLevel);
         }
 
         // Test misspelled "compatability-level" with correctly spelled "compatibility-level"
@@ -275,7 +275,7 @@ namespace TSQLLint.Tests.UnitTests.ConfigFile
 
             // assert
             Assert.IsTrue(configReader.IsConfigLoaded);
-            Assert.AreEqual(130, configReader.CompatabilityLevel);
+            Assert.AreEqual(130, configReader.CompatibilityLevel);
         }
 
         [Test]
@@ -302,7 +302,7 @@ namespace TSQLLint.Tests.UnitTests.ConfigFile
 
             // assert
             Assert.IsTrue(configReader.IsConfigLoaded);
-            Assert.AreEqual(120, configReader.CompatabilityLevel);
+            Assert.AreEqual(120, configReader.CompatibilityLevel);
         }
 
         [Test]
@@ -329,7 +329,7 @@ namespace TSQLLint.Tests.UnitTests.ConfigFile
 
             // assert
             Assert.IsTrue(configReader.IsConfigLoaded);
-            Assert.AreEqual(130, configReader.CompatabilityLevel);
+            Assert.AreEqual(130, configReader.CompatibilityLevel);
         }
 
         [Test]
@@ -356,7 +356,7 @@ namespace TSQLLint.Tests.UnitTests.ConfigFile
 
             // assert
             Assert.IsTrue(configReader.IsConfigLoaded);
-            Assert.AreEqual(120, configReader.CompatabilityLevel);
+            Assert.AreEqual(120, configReader.CompatibilityLevel);
         }
 
         [Test]
@@ -383,7 +383,7 @@ namespace TSQLLint.Tests.UnitTests.ConfigFile
 
             // assert
             Assert.IsTrue(configReader.IsConfigLoaded);
-            Assert.AreEqual(120, configReader.CompatabilityLevel);
+            Assert.AreEqual(120, configReader.CompatibilityLevel);
         }
 
         [Test]
@@ -409,7 +409,7 @@ namespace TSQLLint.Tests.UnitTests.ConfigFile
 
             // assert
             Assert.IsTrue(configReader.IsConfigLoaded);
-            Assert.AreEqual(120, configReader.CompatabilityLevel);
+            Assert.AreEqual(120, configReader.CompatibilityLevel);
         }
 
         [Test]
