@@ -7,22 +7,31 @@ namespace TSQLLint.Infrastructure.Reporters
     public static class NonBlockingConsole
     {
         public static BlockingCollection<string> messageQueue = new BlockingCollection<string>();
+        private static Thread consumerThread;
 
         static NonBlockingConsole()
         {
-            new Thread(() =>
+            consumerThread = new Thread(() =>
             {
                 Thread.CurrentThread.IsBackground = true;
-                while (true)
+                foreach (var message in messageQueue.GetConsumingEnumerable())
                 {
-                    Console.WriteLine(messageQueue.Take());
+                    Console.WriteLine(message);
                 }
-            }).Start();
+            });
+            consumerThread.Start();
         }
 
         public static void WriteLine(string value)
         {
             messageQueue.Add(value);
+        }
+
+        public static void ShutdownAndWait()
+        {
+            messageQueue.CompleteAdding();
+            consumerThread?.Join(TimeSpan.FromSeconds(5));
+            messageQueue.Dispose();
         }
     }
 }

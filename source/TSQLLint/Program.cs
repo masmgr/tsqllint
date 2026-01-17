@@ -17,10 +17,7 @@ namespace TSQLLint
                 var application = new Application(args, new ConsoleReporter());
                 application.Run();
 
-                Task.Run(() =>
-                {
-                    while (NonBlockingConsole.messageQueue.Count > 0) { }
-                }).Wait();
+                NonBlockingConsole.ShutdownAndWait();
             }
             catch (Exception exception)
             {
