@@ -80,7 +80,7 @@ namespace TSQLLint
                     reporter.ClearViolations();
                     fileProcessor.ProcessList(commandLineOptions.LintPath);
 
-                    // Prevent the reportor from douple or tripple counting errors if the while loop evaulates to true;
+                    // Prevent the reporter from double or triple counting errors if the while loop evaluates to true;
                     reporter.ReporterMuted = true;
 
                     if (response.ShouldFix)
