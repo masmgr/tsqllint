@@ -114,7 +114,7 @@ namespace TSQLLint.Tests.UnitTests.Parser
         }
 
         [Test]
-        public void VisitRules_NullFragment_ShouldReportErrors()
+        public void VisitRules_NullFragent_ShouldReportErrors()
         {
             // arrange
             var path = System.IO.Path.GetFullPath(System.IO.Path.Combine(TestContext.CurrentContext.TestDirectory, @"UnitTests/Parser/invalid-characters.sql"));
@@ -138,7 +138,7 @@ namespace TSQLLint.Tests.UnitTests.Parser
         }
 
         [Test]
-        public void VisitRules_NullFragmentWithIgnores_ShouldNotReportErrors()
+        public void VisitRules_NullFragentWithIgnores_ShouldNotReportErrors()
         {
             // arrange
             var path = System.IO.Path.GetFullPath(System.IO.Path.Combine(TestContext.CurrentContext.TestDirectory, @"UnitTests/Parser/invalid-characters-ignore-rules.sql"));

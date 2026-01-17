@@ -37,7 +37,7 @@ namespace TSQLLint.Infrastructure.Rules
             if (regex.Success)
             {
                 var isStartOfLine = regex.ValueSpan.Length <= SET_LENGTH + 1;
-                actions.ReplaceInlineAt(lineIndex, isStartOfLine ? regex.Index : regex.Index + 1, SELECT, SET_LENGTH);
+                actions.RepaceInlineAt(lineIndex, isStartOfLine ? regex.Index : regex.Index + 1, SELECT, SET_LENGTH);
             }
         }
     }

@@ -30,7 +30,7 @@ namespace TSQLLint.Tests.UnitTests.LintingRuleExceptions
             get
             {
                 yield return new TestCaseData(@"integration-test-two.sql", string.Empty, IntegrationTestTwoRuleViolations, 1).SetName("Ignore one select star rule enforce another");
-                yield return new TestCaseData(@"global-disable.sql", string.Empty, new List<RuleViolation>(), 1).SetName("Globally disable rule warnings");
+                yield return new TestCaseData(@"global-disable.sql", string.Empty, new List<RuleViolation>(), 1).SetName("Globally disable rule varnings");
                 yield return new TestCaseData(@"global-enable-without-disbling.sql", string.Empty, GlobalEnableWithoutDisableRuleViolations, 1).SetName("Globally enable without disabling first");
                 yield return new TestCaseData(@"enable-without-disbling.sql", string.Empty, EnableWithoutDisableRuleViolations, 1).SetName("Globally enable without disabling first");
             }

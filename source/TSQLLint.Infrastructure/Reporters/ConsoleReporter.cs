@@ -60,7 +60,7 @@ namespace TSQLLint.Infrastructure.Reporters
             }
 
             // If --fix is turned on sometimes the program runs a couple times to fixed issues
-            // caused by fixing another rule. This prevents double or triple counting.
+            // caused by fixing another rule. This prevents double or tripple counting.
             if (!ReporterMuted)
             {
                 switch (violation.Severity)
