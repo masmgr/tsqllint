@@ -223,7 +223,7 @@ Before applying any linting rules, TSQLLint will replace any placeholder in a SQ
 
 ## Plugins
 
-You can extend the base functionality of TSQLLint by creating a custom plugin. TSQLLint plugins are Dotnet assemblies that implement the IPlugin interface from [TSQLLint.Common](https://www.nuget.org/packages/TSQLLint.Common/). Ensure the plugin is targeting `net8.0`.
+You can extend the base functionality of TSQLLint by creating a custom plugin. TSQLLint plugins are Dotnet assemblies that implement the IPlugin interface from [TSQLLint.Common](https://www.nuget.org/packages/TSQLLint.Common/). Ensure the plugin is targeting `net8.0`, `net9.0`, or `net10.0`.
 
 After developing the plugin, update the .tsqllintrc file to point to its `.dll`.
 
