@@ -55,10 +55,10 @@ namespace TSQLLint.Infrastructure.Rules
 
             public override void Visit(CommitTransactionStatement node)
             {
-                var firstUncommitted = TransactionLists.LastOrDefault(x => x.Commit == null);
-                if (firstUncommitted != null)
+                var firstUncomitted = TransactionLists.LastOrDefault(x => x.Commit == null);
+                if (firstUncomitted != null)
                 {
-                    firstUncommitted.Commit = node;
+                    firstUncomitted.Commit = node;
                 }
             }
         }

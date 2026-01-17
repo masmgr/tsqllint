@@ -46,7 +46,7 @@ namespace TSQLLint.Infrastructure.Rules
                 if (paramVisitor.IsWildcard)
                 {
                     var whileCard = paramVisitor.Expression;
-                    actions.ReplaceInlineAt(whileCard.StartLine - 1, whileCard.StartColumn - 1, "1");
+                    actions.RepaceInlineAt(whileCard.StartLine - 1, whileCard.StartColumn - 1, "1");
                 }
             }
         }

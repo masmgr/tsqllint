@@ -9,7 +9,7 @@ namespace TSQLLint.Tests.Helpers.HelperTests
 {
     public class RuleViolationCompareTests
     {
-        public static readonly object[] NonEquivalentRuleViolations =
+        public static readonly object[] NonEquilaventRuleViolations =
         {
             new object[]
             {
@@ -37,7 +37,7 @@ namespace TSQLLint.Tests.Helpers.HelperTests
             }
         };
 
-        public static readonly object[] EquivalentRuleViolations =
+        public static readonly object[] EquilaventRuleViolations =
         {
             new object[]
             {
@@ -52,15 +52,15 @@ namespace TSQLLint.Tests.Helpers.HelperTests
         private readonly RuleViolationComparer ruleViolationComparer = new RuleViolationComparer();
 
         [Test]
-        [TestCaseSource(nameof(EquivalentRuleViolations))]
-        public void CompareEquivalentRulesTest(List<RuleViolation> ruleViolations)
+        [TestCaseSource(nameof(EquilaventRuleViolations))]
+        public void CompareEquilaventRulesTest(List<RuleViolation> ruleViolations)
         {
             Assert.AreEqual(0, ruleViolationComparer.Compare(ruleViolations[0], ruleViolations[1]));
         }
 
         [Test]
-        [TestCaseSource(nameof(NonEquivalentRuleViolations))]
-        public void CompareNonEquivalentRulesTest(List<RuleViolation> ruleViolations)
+        [TestCaseSource(nameof(NonEquilaventRuleViolations))]
+        public void CompareNonEquilaventRulesTest(List<RuleViolation> ruleViolations)
         {
             Assert.AreEqual(-1, ruleViolationComparer.Compare(ruleViolations[0], ruleViolations[1]));
         }
