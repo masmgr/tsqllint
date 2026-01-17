@@ -213,8 +213,10 @@ namespace TSQLLint.Infrastructure.Parser
 
         private void ProcessPlugins(Stream fileStream, IEnumerable<IRuleException> ignoredRules, string filePath)
         {
-            TextReader textReader = new StreamReader(fileStream);
-            pluginHandler.ActivatePlugins(new PluginContext(filePath, ignoredRules, textReader));
+            using (TextReader textReader = new StreamReader(fileStream, leaveOpen: true))
+            {
+                pluginHandler.ActivatePlugins(new PluginContext(filePath, ignoredRules, textReader));
+            }
         }
 
         private Stream GetFileContents(string filePath)

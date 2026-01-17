@@ -23,10 +23,16 @@ namespace TSQLLint.Infrastructure.Parser
 
         public StreamReader CreateReader(Stream sqlFileStream)
         {
-            var sqlText = new StreamReader(sqlFileStream);
-            sqlFileStream.Seek(0, SeekOrigin.Begin);
-            var sql = ReplaceSqlPlaceholders(sqlText.ReadToEnd());
-            return new StreamReader(new MemoryStream(sqlText.CurrentEncoding.GetBytes(sql)));
+            string sql;
+            Encoding encoding;
+
+            using (var sqlText = new StreamReader(sqlFileStream, leaveOpen: true))
+            {
+                encoding = sqlText.CurrentEncoding;
+                sql = ReplaceSqlPlaceholders(sqlText.ReadToEnd());
+            }
+
+            return new StreamReader(new MemoryStream(encoding.GetBytes(sql)));
         }
 
         private string ReplaceSqlPlaceholders(string sql)
