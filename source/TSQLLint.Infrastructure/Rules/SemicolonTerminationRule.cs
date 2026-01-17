@@ -13,9 +13,6 @@ namespace TSQLLint.Infrastructure.Rules
     {
         private readonly IList<TSqlFragment> waitForStatements = new List<TSqlFragment>();
         private readonly IList<TSqlFragment> functionReturnTypeSelectStatements = new List<TSqlFragment>();
-        private static Regex WhiteSpaceRegex = new Regex(@"\s", RegexOptions.Compiled);
-        private static Regex AllWhiteSpaceRegex = new Regex(@"^\s$", RegexOptions.Compiled);
-
 
         // don't enforce semicolon termination on these statements
         private readonly Type[] typesToSkip =
