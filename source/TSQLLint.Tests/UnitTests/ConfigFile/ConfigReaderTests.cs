@@ -333,6 +333,60 @@ namespace TSQLLint.Tests.UnitTests.ConfigFile
         }
 
         [Test]
+        public void ConfigReaderGetParserFromValidInt160()
+        {
+            // arrange
+            var configFilePath = TestHelper.GetTestFilePath(@"C:\Users\User\.tsqllintrc");
+            var mockFileSystem = new MockFileSystem(new Dictionary<string, MockFileData>
+            {
+                {
+                    configFilePath, new MockFileData(@"
+                    {
+                        'compatibility-level': 160
+                    }")
+                }
+            });
+
+            var mockReporter = Substitute.For<IReporter>();
+            var environmentWrapper = Substitute.For<IEnvironmentWrapper>();
+
+            // act
+            var configReader = new ConfigReader(mockReporter, mockFileSystem, environmentWrapper);
+            configReader.LoadConfig(configFilePath);
+
+            // assert
+            Assert.IsTrue(configReader.IsConfigLoaded);
+            Assert.AreEqual(160, configReader.CompatibilityLevel);
+        }
+
+        [Test]
+        public void ConfigReaderGetParserFromValidInt170()
+        {
+            // arrange
+            var configFilePath = TestHelper.GetTestFilePath(@"C:\Users\User\.tsqllintrc");
+            var mockFileSystem = new MockFileSystem(new Dictionary<string, MockFileData>
+            {
+                {
+                    configFilePath, new MockFileData(@"
+                    {
+                        'compatibility-level': 170
+                    }")
+                }
+            });
+
+            var mockReporter = Substitute.For<IReporter>();
+            var environmentWrapper = Substitute.For<IEnvironmentWrapper>();
+
+            // act
+            var configReader = new ConfigReader(mockReporter, mockFileSystem, environmentWrapper);
+            configReader.LoadConfig(configFilePath);
+
+            // assert
+            Assert.IsTrue(configReader.IsConfigLoaded);
+            Assert.AreEqual(170, configReader.CompatibilityLevel);
+        }
+
+        [Test]
         public void ConfigReaderGetParserFromInValidInt()
         {
             // arrange

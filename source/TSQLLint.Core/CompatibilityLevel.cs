@@ -6,7 +6,7 @@ namespace TSQLLint.Core
     {
         public static int Validate(int compatibilityLevel)
         {
-            var validCompatibilityLevels = new List<int> { 80, 90, 100, 110, 120, 130, 140, 150 };
+            var validCompatibilityLevels = new List<int> { 80, 90, 100, 110, 120, 130, 140, 150, 160, 170 };
             return validCompatibilityLevels.Contains(compatibilityLevel)
                 ? compatibilityLevel
                 : Constants.DefaultCompatibilityLevel;
