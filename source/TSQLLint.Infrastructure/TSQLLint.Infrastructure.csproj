@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net6.0;net7.0;net8.0</TargetFrameworks>
+    <TargetFrameworks>net8.0</TargetFrameworks>
     <PackAsTool>true</PackAsTool>
     <PackageOutputPath>./artifacts</PackageOutputPath>
   </PropertyGroup>
@@ -12,11 +12,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Azure.Identity" Version="1.17.1" />
     <PackageReference Include="CommandLineParser" Version="1.9.71" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.7" />
     <PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" Version="6.0.0" />
-    <PackageReference Include="Microsoft.SqlServer.DacFx" Version="160.5400.1" />
+    <PackageReference Include="Microsoft.SqlServer.DacFx" Version="170.2.70" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="TSQLLint.Common" Version="3.3.0" />
+    <PackageReference Include="TSQLLint.Common" Version="3.3.3" />
     <PackageReference Include="System.IO.Abstractions" Version="17.0.24" />
   </ItemGroup>
 
