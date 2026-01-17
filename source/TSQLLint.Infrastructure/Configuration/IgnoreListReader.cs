@@ -30,6 +30,11 @@ namespace TSQLLint.Infrastructure.Configuration
             this.environmentWrapper = environmentWrapper;
         }
 
+        /// <summary>
+        /// Gets a value indicating whether ignore list loading was attempted and completed.
+        /// True when an ignore list file is loaded or when no files are found (empty list).
+        /// False only when LoadIgnoreList is not called.
+        /// </summary>
         public bool IsIgnoreListLoaded { get; private set; } = false;
 
         public void LoadIgnoreList(string path)
@@ -75,6 +80,7 @@ namespace TSQLLint.Infrastructure.Configuration
                 {
                     reporter.Report($@"Config file not found: {path}");
                     IgnoreList = Enumerable.Empty<string>();
+                    IsIgnoreListLoaded = true;
                 }
             }
         }

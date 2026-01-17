@@ -62,8 +62,8 @@ namespace TSQLLint.Tests.UnitTests.ConfigFile
             var ignoreListReader = new IgnoreListReader(reporter, fileSystem, environmentWrapper);
             ignoreListReader.LoadIgnoreList(TestHelper.GetTestFilePath(@"c:\users\someone\.tsqllintignore"));
 
-            // assert
-            Assert.IsFalse(ignoreListReader.IsIgnoreListLoaded);
+            // assert (explicit path not found = loaded empty list, consistent with default behavior)
+            Assert.IsTrue(ignoreListReader.IsIgnoreListLoaded);
             CollectionAssert.AreEqual(ignoreListReader.IgnoreList, new List<string>());
         }
 
