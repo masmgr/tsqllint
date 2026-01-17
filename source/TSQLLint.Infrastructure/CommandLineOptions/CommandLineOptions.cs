@@ -61,6 +61,12 @@ namespace TSQLLint.Infrastructure.CommandLineOptions
         public bool PrintConfig { get; set; }
 
         [Option(
+            longName: "stdout",
+            Required = false,
+            HelpText = "Write fixed SQL to stdout when linting from stdin")]
+        public bool Stdout { get; set; }
+
+        [Option(
             'l',
              longName: "list-plugins",
              Required = false,
@@ -89,7 +95,7 @@ namespace TSQLLint.Infrastructure.CommandLineOptions
                 AddDashesToOption = true
             };
 
-            help.AddPreOptionsLine("tsqllint [options] [file.sql] | [dir] | [file.sql | dir]");
+            help.AddPreOptionsLine("tsqllint [options] [file.sql] | [dir] | [file.sql | dir] | -");
             help.AddOptions(this);
             return help;
         }

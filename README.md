@@ -52,6 +52,12 @@ tsqllint test.sql
 # fix all auto-fixable problems (--fix or -x)
 tsqllint --fix test.sql
 
+# lint from stdin (use "-" as the path)
+tsqllint - < test.sql
+
+# fix from stdin and write fixed SQL to stdout
+tsqllint --fix --stdout - < test.sql
+
 # lint all files in a directory
 tsqllint c:\database_scripts
 

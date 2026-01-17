@@ -92,6 +92,12 @@ namespace TSQLLint.Infrastructure.Parser
 
             Parallel.ForEach(filePathList, (filePath) =>
             {
+                if (IsStandardInputPath(filePath))
+                {
+                    ProcessStandardInput();
+                    return;
+                }
+
                 if (!fileSystem.File.Exists(filePath))
                 {
                     if (fileSystem.Directory.Exists(filePath))
@@ -110,6 +116,19 @@ namespace TSQLLint.Infrastructure.Parser
             });
         }
 
+        private static bool IsStandardInputPath(string filePath)
+        {
+            return string.Equals(filePath, "-", StringComparison.Ordinal);
+        }
+
+        private void ProcessStandardInput()
+        {
+            var sql = System.Console.In.ReadToEnd();
+            var sqlBytes = System.Console.InputEncoding.GetBytes(sql);
+            AddToProcessing("-", new MemoryStream(sqlBytes));
+            Interlocked.Increment(ref _fileCount);
+        }
+
         private void ProcessFile(string filePath)
         {
             var fileStream = GetFileContents(filePath);
@@ -118,7 +137,7 @@ namespace TSQLLint.Infrastructure.Parser
             Interlocked.Increment(ref _fileCount);
         }
 
-        private bool IsWholeFileIgnored(string filePath, IEnumerable<IExtendedRuleException> ignoredRules)
+        private bool IsWholeFileIgnored(Stream fileStream, IEnumerable<IExtendedRuleException> ignoredRules)
         {
             var ignoredRulesEnum = ignoredRules.ToArray();
             if (!ignoredRulesEnum.Any())
@@ -133,13 +152,15 @@ namespace TSQLLint.Infrastructure.Parser
             }
 
             var lineCount = 0;
-            using (var reader = new StreamReader(GetFileContents(filePath)))
+            using (var reader = new StreamReader(fileStream, System.Text.Encoding.UTF8, true, 1024, true))
             {
                 while (reader.ReadLine() != null)
                 {
                     lineCount++;
                 }
             }
+
+            fileStream.Seek(0, SeekOrigin.Begin);
 
             return lineOneRuleIgnores.Any(x => x.EndLine == lineCount);
         }
@@ -152,7 +173,7 @@ namespace TSQLLint.Infrastructure.Parser
         private void HandleProcessing(string filePath, Stream fileStream)
         {
             var ignoredRules = ruleExceptionFinder.GetIgnoredRuleList(fileStream).ToList();
-            if (IsWholeFileIgnored(filePath, ignoredRules))
+            if (IsWholeFileIgnored(fileStream, ignoredRules))
             {
                 return;
             }

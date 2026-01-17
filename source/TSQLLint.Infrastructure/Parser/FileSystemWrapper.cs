@@ -12,7 +12,7 @@ namespace TSQLLint.Infrastructure.Parser
         {
             fileSystem = new FileSystem();
         }
-        
+
         public bool FileExists(string path)
         {
             path = RemoveQuotes(path);
@@ -22,6 +22,11 @@ namespace TSQLLint.Infrastructure.Parser
         public bool PathIsValidForLint(string path)
         {
             path = RemoveQuotes(path);
+            if (string.Equals(path, "-", System.StringComparison.Ordinal))
+            {
+                return true;
+            }
+
             if (!fileSystem.File.Exists(path))
             {
                 return fileSystem.Directory.Exists(path) || PathContainsWildCard(path);
