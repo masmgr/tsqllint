@@ -66,7 +66,7 @@ namespace TSQLLint.Infrastructure.Parser
                 }
             }
 
-            return parser ?? new TSql120Parser(true);
+            return parser ?? new TSql160Parser(true);
         }
     }
 }
