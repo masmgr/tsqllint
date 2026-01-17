@@ -24,6 +24,7 @@ namespace TSQLLint.Infrastructure.Configuration
         ""linked-server"": ""error"",
         ""multi-table-alias"": ""error"",
         ""named-constraint"": ""error"",
+        ""nested-block-comments"": ""warning"",
         ""non-sargable"": ""error"",
         ""object-property"": ""error"",
         ""print-statement"": ""error"",

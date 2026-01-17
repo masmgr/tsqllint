@@ -68,6 +68,10 @@
         "named-constraint": {
           "$ref": "#/definitions/rule"
         },
+        "nested-block-comments": {
+          "$ref": "#/definitions/rule",
+          "description": "Warns on nested block comments because some SQL tooling does not support them"
+        },
         "non-sargable": {
           "$ref": "#/definitions/rule"
         },
