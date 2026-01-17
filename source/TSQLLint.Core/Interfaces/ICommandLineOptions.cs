@@ -24,6 +24,8 @@ namespace TSQLLint.Core.Interfaces
 
         bool PrintConfig { get; set; }
 
+        bool Stdout { get; set; }
+
         bool Version { get; set; }
 
         string GetUsage();

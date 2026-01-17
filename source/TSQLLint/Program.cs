@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Threading.Tasks;
 using TSQLLint.Infrastructure.Reporters;
 
@@ -12,9 +13,19 @@ namespace TSQLLint
         {
             try
             {
-                NonBlockingConsole.WriteLine("running tsqllint");
+                var useStdout = args.Any(arg => string.Equals(arg, "--stdout", StringComparison.Ordinal));
+                if (!useStdout)
+                {
+                    NonBlockingConsole.WriteLine("running tsqllint");
+                }
 
-                var application = new Application(args, new ConsoleReporter());
+                if (args.Length == 0 && Console.IsInputRedirected)
+                {
+                    args = new[] { "-" };
+                }
+
+                IConsoleReporter reporter = useStdout ? new StandardErrorReporter() : new ConsoleReporter();
+                var application = new Application(args, reporter);
                 application.Run();
 
                 NonBlockingConsole.ShutdownAndWait();

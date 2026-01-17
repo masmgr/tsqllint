@@ -3,7 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+
 using NUnit.Framework;
+using TSQLLint.Infrastructure.Reporters;
 using TSQLLint.Infrastructure.Rules.RuleViolations;
 using TSQLLint.Tests.Helpers;
 
@@ -159,6 +161,74 @@ namespace TSQLLint.Tests.UnitTests.CommandLineOptions
         public void RunExistingConfigTest(List<string> argumentsUnderTest, string expectedMessage, List<RuleViolation> expectedRuleViolations, int expectedFileCount)
         {
             TestHelper.PerformApplicationTest(argumentsUnderTest, expectedMessage, expectedRuleViolations, expectedFileCount);
+        }
+
+        [Test]
+        public void RunApplicationWithStandardInput()
+        {
+            var originalInput = Console.In;
+            var originalError = Console.Error;
+            try
+            {
+                var sqlText = File.ReadAllText(TestFileOne);
+                var error = new StringWriter();
+
+                Console.SetIn(new StringReader(sqlText));
+                Console.SetError(error);
+
+                var argumentsUnderTest = new List<string> { "-c", ValidConfigFile, "-" };
+                TestHelper.PerformApplicationTest(argumentsUnderTest, null, new List<RuleViolation>(TestFileOneRuleViolations), 1);
+
+                Assert.IsEmpty(error.ToString(), "StandardInput test should not produce error output");
+            }
+            finally
+            {
+                Console.SetIn(originalInput);
+                Console.SetError(originalError);
+            }
+        }
+
+        [Test]
+        public void RunApplicationWithStandardInputFixToStdout()
+        {
+            var originalInput = Console.In;
+            var originalOutput = Console.Out;
+            var originalError = Console.Error;
+            try
+            {
+                var sqlText = "select * FROM BAR";
+                var output = new StringWriter();
+                var error = new StringWriter();
+
+                Console.SetIn(new StringReader(sqlText));
+                Console.SetOut(output);
+                Console.SetError(error);
+
+                var argumentsUnderTest = new[] { "-c", ValidConfigFile, "--fix", "--stdout", "-" };
+                var application = new Application(argumentsUnderTest, new StandardErrorReporter());
+                application.Run();
+                var expectedOutputLines = new[]
+                {
+                    "SET ANSI_NULLS ON;",
+                    "SET NOCOUNT ON;",
+                    "SET QUOTED_IDENTIFIER ON;",
+                    "SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;",
+                    "SELECT * FROM BAR;"
+                };
+
+                var expectedOutput = string.Join(Environment.NewLine, expectedOutputLines) + Environment.NewLine;
+
+                Assert.AreEqual(expectedOutput, output.ToString());
+                Assert.IsNotEmpty(error.ToString(), "Fix to stdout should produce error output with rule violations");
+                StringAssert.Contains("error keyword-capitalization", error.ToString());
+                StringAssert.Contains("Fixed", error.ToString());
+            }
+            finally
+            {
+                Console.SetIn(originalInput);
+                Console.SetOut(originalOutput);
+                Console.SetError(originalError);
+            }
         }
     }
 }
